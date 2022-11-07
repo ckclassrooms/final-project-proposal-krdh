@@ -9,8 +9,8 @@ For the front end of the web app we’ll be using React/HTML and JS/Node for the
 
 For APIs, we’ll be using Firebase Auth and Firebase Realtime Database along with any UI APIs if necessary.
 
- <img width="888" alt="Screen Shot 2022-11-07 at 4 04 32 PM" src="https://user-images.githubusercontent.com/89808902/200425281-ea0c9f3b-e2b4-4bb6-8035-b030cc143bb9.png">
- 
+<img width="863" alt="Screen Shot 2022-11-07 at 4 10 28 PM" src="https://user-images.githubusercontent.com/89808902/200426235-5b7151b6-741d-4a22-bb23-90fb3faca249.png">
+
 MVP for November 18th
 Users will login and be able to join a Bench Press queue regardless of their weight class. They will take turns logging data for 135 lbs where a winner will be announced at the end.
 
