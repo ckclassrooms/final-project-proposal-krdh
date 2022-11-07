@@ -1,22 +1,16 @@
 # final-project-proposal-krdh
 final-project-proposal-krdh created by GitHub Classroom
 
-484 Final Project Write Up 
-What does your application do?
-- For our 484 project, we’ll be working with a Dr. Derick D. Jones Jr (https://www.linkedin.com/in/derickjones/), 
-  who’s a professor of chemistry at Columbia College. For his chemistry lab, he specified that he needs a web app where he could post notes, 
-  articles, grades, and updates to his students. Users would be able to make an account as a student or as an admin. 
-  The admin (who would be Dr. Jones), would be able to create posts and students would be able to interact with the posts and possibly comment.
+Our final project for CS 484 will be a web extension of the DylFyt gym log app on the app store which will be a buddy workout feature. Users will log into their DylFyt account (with Firebase Auth API) where they will be asked about their weight class upon first login. Then there will be a list of different movements like bench press, squats, deadlift etc. where the user can join a queue where they will be paired with someone in their weight class. Users will agree on a weight where they will compete by pushing/pulling as much weight as possible over 4 sets. Users will be prompted to log their data by taking turns and once the 4 sets are complete one of the users will be announced as the winner. 
 
-What makes it different than a CRUD app? I.e., what functionality does it provide that is not just a user interface layer on top of a database of user information, and the ability to view / add to / change that information?
-- For this part we will need to meet with Dr.Jones this week to get the full details of what he needs.
-  All he described in a short conversation was that he needed a basic CRUD app for his chemistry lab, but we can expand on this idea after talking to him more. 
-  There are likely some specific things he needs that would make our web app unique. 
-  If that’s not the case, we can do something interesting with APIs that could help students in their labs or do something interesting with grade data/lab data. 
+We’ll be using GitHub Pages to host our site and Firebase to host a live database. In Firebase we will create a collection called “Matches” where all match data will live and be linked to each user’s UID. Once a match is over, that data will be deleted. 
 
-What security and privacy concerns do you expect you (as developers) or your users to have with this application?
-- Cookies - We can use cookies for session management to keep the admin and students logged in. Cookies come with a host of vulnerabilities. We need to ensure cookies are encrypted so they can’t be attacked using things like HttpOnly.
-- Cross Site Scripting (XSS) - This can occur as we may allow users to write and post content. If our fields are unfiltered, an attacker can post malicious JavaScript and HTML content to steal data like tokens, cookies, logins, and other sensitive information.
-- Cross-site Request Forgery Attack - If we pull content from other sources we need to be careful about malicious websites that could potentially initiate malicious actions. We’ll likely apply the Same Origin Policy.
+For the front end of the web app we’ll be using React/HTML and JS/Node for the backend. Users will log their data on the iOS app which will use some refactored Swift code to send data to the database which will be updated live on the web app. 
+
+For APIs, we’ll be using Firebase Auth and Firebase Realtime Database along with any UI APIs if necessary.
 
  <img width="888" alt="Screen Shot 2022-11-07 at 4 04 32 PM" src="https://user-images.githubusercontent.com/89808902/200425281-ea0c9f3b-e2b4-4bb6-8035-b030cc143bb9.png">
+ 
+MVP for November 18th
+Users will login and be able to join a Bench Press queue regardless of their weight class. They will take turns logging data for 135 lbs where a winner will be announced at the end.
+
