@@ -18,3 +18,5 @@ What security and privacy concerns do you expect you (as developers) or your use
 - Cookies - We can use cookies for session management to keep the admin and students logged in. Cookies come with a host of vulnerabilities. We need to ensure cookies are encrypted so they can’t be attacked using things like HttpOnly.
 - Cross Site Scripting (XSS) - This can occur as we may allow users to write and post content. If our fields are unfiltered, an attacker can post malicious JavaScript and HTML content to steal data like tokens, cookies, logins, and other sensitive information.
 - Cross-site Request Forgery Attack - If we pull content from other sources we need to be careful about malicious websites that could potentially initiate malicious actions. We’ll likely apply the Same Origin Policy.
+
+ <img width="888" alt="Screen Shot 2022-11-07 at 4 04 32 PM" src="https://user-images.githubusercontent.com/89808902/200425281-ea0c9f3b-e2b4-4bb6-8035-b030cc143bb9.png">
