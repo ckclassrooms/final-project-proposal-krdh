@@ -14,3 +14,4 @@ For APIs, we’ll be using Firebase Auth and Firebase Realtime Database along wi
 MVP for November 18th
 Users will login and be able to join a Bench Press queue regardless of their weight class. They will take turns logging data for 135 lbs where a winner will be announced at the end.
 
+https://ckclassrooms.github.io/final-project-proposal-krdh/
