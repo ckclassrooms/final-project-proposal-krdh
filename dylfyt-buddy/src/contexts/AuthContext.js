@@ -11,10 +11,12 @@ export function AuthProvider({ children }) {
     const [currentUser, setCurrentUser] = useState()
 
     function signup(email, password) {
+        // creates usser in firebase
         auth.createUserWithEmailAndPassword(email, password)
     }
 
     useEffect(() => {
+        // listen for change in user
         const unsubscribe = auth.onAuthStateChanged(user => {
             setCurrentUser(user)
         })
