@@ -7,6 +7,7 @@ export function useAuth() {
     return useContext(AuthContext)
 }
 
+
 export function AuthProvider({ children }) {
     const [currentUser, setCurrentUser] = useState()
     const [loading, setLoading] = useState(true)
@@ -15,6 +16,10 @@ export function AuthProvider({ children }) {
         // creates usser in firebase
         auth.createUserWithEmailAndPassword(email, password)
     }
+
+    function login(email, password) {
+        return auth.signInWithEmailAndPassword(email, password)
+      }
 
     useEffect(() => {
         // listen for change in user
@@ -28,7 +33,8 @@ export function AuthProvider({ children }) {
     
     const value = {
         currentUser,
-        signup
+        signup,
+        login
     }
     
     return (
