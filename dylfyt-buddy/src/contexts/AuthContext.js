@@ -9,6 +9,7 @@ export function useAuth() {
 
 export function AuthProvider({ children }) {
     const [currentUser, setCurrentUser] = useState()
+    const [loading, setLoading] = useState(true)
 
     function signup(email, password) {
         // creates usser in firebase
@@ -19,18 +20,20 @@ export function AuthProvider({ children }) {
         // listen for change in user
         const unsubscribe = auth.onAuthStateChanged(user => {
             setCurrentUser(user)
+            setLoading(false)
         })
         // stops listening to listener
         return unsubscribe
     }, [])
     
     const value = {
-        currentUser
+        currentUser,
+        signup
     }
     
     return (
     <AuthContext.Provider value={value}>
-        {children}
+        {!loading && children}
     </AuthContext.Provider>
   )
 }
