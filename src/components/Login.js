@@ -13,16 +13,15 @@ export default function Login() {
 
   async function handleSubmit(e) {
     e.preventDefault()
-
     try {
       setError("")
       setLoading(true)
+      // - Login
       await login(emailRef.current.value, passwordRef.current.value)
       navigate("/");
     } catch {
       setError("Failed to log in")
     }
-
     setLoading(false)
   }
 
@@ -41,17 +40,17 @@ export default function Login() {
               <Form.Label>Password</Form.Label>
               <Form.Control type="password" ref={passwordRef} required />
             </Form.Group>
-            <Button disabled={loading} className="w-100 mt-4" type="submit">
+            <Button disabled={loading} className="border border-success bg-success w-100 mt-4" type="submit">
               Log In
             </Button>
           </Form>
           <div className="w-100 text-center mt-3">
-            <Link to="/forgot-password">Forgot Password?</Link>
+            <Link to="/forgot-password"  className="text-success">Forgot Password?</Link>
           </div>
         </Card.Body>
       </Card>
       <div className="w-100 text-center mt-2">
-        Need an account? <Link to="/signup">Sign Up</Link>
+        Need an account? <Link to="/signup" className="text-success">Sign Up</Link>
       </div>
     </>
   )

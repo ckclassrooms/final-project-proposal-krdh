@@ -13,12 +13,10 @@ export default function Signup() {
     const navigate = useNavigate()
 
     async function handleSubmit(e){
-        e.preventDefault() // prevent from refreshing
-
+        e.preventDefault() // - Prevent user from refreshing
         if (passwordRef.current.value !== passwordConfirmRef.current.value) {
             return setError('Passwords do not match')
         }
-
         try {
             setError('')
             setLoading(true)
@@ -50,7 +48,7 @@ export default function Signup() {
                     <Form.Label>Password Confirmation</Form.Label>
                     <Form.Control type="password" ref={passwordConfirmRef}required />
                 </Form.Group>
-                <Button disabeled={loading} className="w-100 mt-4" type="submit">
+                <Button disabeled={loading} className="border border-success bg-success w-100 mt-4" type="submit">
                     Sign Up
                 </Button>
             </Form>

@@ -22,16 +22,22 @@ export default function Dashboard() {
     <>
       <Card>
         <Card.Body>
-            <h2 className="text-center mb-4">Profile</h2>
+            <h2 className="text-center mb-4">Welcome to DylFyt Buddy</h2>
             {error && <Alert variant="danger">{error}</Alert>}
-            <strong>Email:</strong> {currentUser.email}
-            <Link to="/update-profile" className="btn btn-primary w-100 mt-3">
-                Update Profile
+            <strong>Account: </strong> {currentUser.email}
+            <Link to="/benchpress" className="border border-success bg-success btn btn-primary w-100 mt-4">
+                Join Bench Press Queue
+            </Link>
+            <Link to="/deadlift" className="border border-success bg-success btn btn-primary w-100 mt-4">
+                Join Deadlift Queue
+            </Link>
+            <Link to="/squat" className="border border-success bg-success btn btn-primary w-100 mt-4">
+                Join Squat Queue
             </Link>
         </Card.Body>
       </Card>
-      <div className="w-100 text-center mt-2">
-        <Button variant="link" onClick={handleLogout}>Log Out</Button>
+      <div className="w-150 text-center mt-4">
+        <Button variant="link" onClick={handleLogout} className="text-success">Log Out</Button>
       </div>
     </>
   )
