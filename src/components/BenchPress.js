@@ -3,13 +3,14 @@ import "firebase/database"
 import { Button } from "react-bootstrap"
 import { useState } from "react";
 import { db } from "../firebase";
-import { collection, getDocs, addDoc } from "firebase/firestore";
+import { collection, getDocs, addDoc, doc, deleteDoc } from "firebase/firestore";
 import firebase from "firebase/compat/app";
 
 function BenchPress({benchPressQueue, setBenchPressQueue}) {
 
   const [newWeight, setNewWeight] = useState(0);
-  const benchPressQueueCollectionRef = collection(db, "benchPressQueue");  
+  const [newID, setNewID] = useState(0);
+  const benchPressQueueCollectionRef = collection(db, "benchPressQueue"); 
 
   const addUserToQueue = async () => {
     firebase.auth().onAuthStateChanged(async function(user) {
@@ -33,13 +34,28 @@ function BenchPress({benchPressQueue, setBenchPressQueue}) {
           console.log("Weight class must be higher than 0")
         } else {
           // - If user not in queue and they enter a valid weight class, put them in the queue
-          await addDoc(benchPressQueueCollectionRef, {email: email, weightClass: Number(newWeight) });
+          await addDoc(benchPressQueueCollectionRef, {email: email, weightClass: Number(newWeight) })
+          .then(docRef => {
+            // - Save current ID of user spot in queue
+            setNewID(docRef.id)
+          });
           const data = await getDocs(benchPressQueueCollectionRef)
           setBenchPressQueue(data.docs.map((doc) => ({...doc.data(), id: doc.id})))
         }
       }
     });
   };
+
+  const removeUserFromQueue = async () => {
+    firebase.auth().onAuthStateChanged(async function(user) {
+      // - If user is authenticated
+      if (user) {
+        // - Remove user from queue
+        await deleteDoc(doc(db, "benchPressQueue", newID));
+        const data = await getDocs(benchPressQueueCollectionRef)
+        setBenchPressQueue(data.docs.map((doc) => ({...doc.data(), id: doc.id})))
+      }
+  })};
 
     return (
       <div>
@@ -50,7 +66,7 @@ function BenchPress({benchPressQueue, setBenchPressQueue}) {
         <Button onClick = {addUserToQueue} className="border border-success bg-success w-100 mb-4 mt-4" type="submit">
                 Join
         </Button>
-        <Button className="border border-danger bg-danger w-100 mb-4" type="submit">
+        <Button onClick = {removeUserFromQueue} className="border border-danger bg-danger w-100 mb-4" type="submit">
                 Leave
         </Button>
 
@@ -79,9 +95,7 @@ function UserRow({user}) {
   // - Populate html list with every user 
   return (
     <tr className="user">
-      <td><button
-        className="btn-close" aria-label="cancel" type="button" onClick = {() => {
-        }} ></button></td>
+      <td></td>
       <td>{user.email}</td>
       <td>{user.weightClass}</td>
     </tr>
