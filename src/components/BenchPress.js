@@ -15,6 +15,8 @@ function BenchPress({benchPressQueue, setBenchPressQueue}) {
   const addUserToQueue = async () => {
     firebase.auth().onAuthStateChanged(async function(user) {
       // - If user is authenticated
+      console.log("ADDED")
+      console.trace();
       if (user) {
         // - Get current user email
         var email = user.email;
@@ -51,11 +53,23 @@ function BenchPress({benchPressQueue, setBenchPressQueue}) {
       // - If user is authenticated
       if (user) {
         // - Remove user from queue
-        await deleteDoc(doc(db, "benchPressQueue", newID));
+        await deleteDoc(doc(db, "benchPressQueue", `${newID}`));
         const data = await getDocs(benchPressQueueCollectionRef)
         setBenchPressQueue(data.docs.map((doc) => ({...doc.data(), id: doc.id})))
       }
   })};
+
+  window.onpopstate = function(event) {
+    // -  When user clicks backspace
+    removeUserFromQueue();
+    event.preventDefault();
+  };
+
+  window.onbeforeunload = function(event) {
+    // -  When user clicks backspace
+    removeUserFromQueue();
+    event.preventDefault();
+  };
 
     return (
       <div>
