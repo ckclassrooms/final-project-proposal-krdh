@@ -5,6 +5,7 @@ import { useState } from "react";
 import { db } from "../firebase";
 import { collection, getDocs, addDoc, doc, deleteDoc } from "firebase/firestore";
 import firebase from "firebase/compat/app";
+import { Link } from "react-router-dom"
 
 function BenchPress({benchPressQueue, setBenchPressQueue}) {
 
@@ -102,6 +103,8 @@ function BenchPress({benchPressQueue, setBenchPressQueue}) {
         </tbody>
       </table>
     </div>
+      <div className="w-100 text-center mt-2"><Link to="/chat-room" className="text-success">Chat Room</Link>
+      </div>
       </div>
 )
 

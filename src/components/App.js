@@ -10,6 +10,7 @@ import PrivateRoute from "./PrivateRoute";
 import BenchPress from "./BenchPress";
 import Deadlift from "./Deadlift";
 import Squat from "./Squat";
+import BenchPressChatRoom from "./BenchPressChatRoom";
 import {db} from '../firebase'
 import { collection, getDocs, query, onSnapshot  } from 'firebase/firestore'
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -66,6 +67,7 @@ function App() {
               <Route path='/deadlift' element={<Deadlift/>} />
               <Route path='/squat' element={<Squat/>} />
               <Route path="/forgot-password" element={<ForgotPassword/>} />
+              <Route path="/chat-room" element={<BenchPressChatRoom/>} />
             </Routes>
           </AuthProvider>
           </Router>
