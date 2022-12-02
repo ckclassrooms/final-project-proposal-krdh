@@ -1,6 +1,6 @@
 import React from 'react'
 import './Bench.css';
-import { collection, doc, deleteDoc } from "firebase/firestore";
+import { collection, doc, deleteDoc, updateDoc, increment, getDocs, setDoc } from "firebase/firestore";
 import {useState, useRef} from 'react';
 import { db } from "../firebase";
 
@@ -20,6 +20,7 @@ function BenchPressChatRoom() {
     const [oppWeightPushed, setOppTotalWeightPushed] = useState(0);
 
     const benchPressChatRoomRef = collection(db, "benchPressChatRoom"); 
+    const benchPressMessagesRef = collection(db, "benchPressMessages"); 
 
     const removeUserFromQueue = async () => {
       firebase.auth().onAuthStateChanged(async function(user) {
@@ -72,10 +73,30 @@ function BenchPressChatRoom() {
                   createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                   uid
               })
+          
               setFormWeight('');
               setFormReps('');
               dummy.current.scrollIntoView({ behavior: 'smooth' });
-              }
+
+              firebase.auth().onAuthStateChanged(async function(user) {
+                // - If user is authenticated
+                if (user) {
+                  const data = await getDocs(benchPressMessagesRef)
+                  // - Get all users in the bench press queue
+                  const messages = data.docs.map((doc) => ({...doc.data(), id: doc.id}))
+                  if (messages.length === 3) {
+                      await setDoc(doc(db, "benchPressMessages",  user.email), {
+                        score: formWeight * formReps,
+                      });
+                  } else {
+                    const userRef = doc(db, "benchPressMessages", user.email);
+                      await updateDoc(userRef, {
+                      score: increment(formWeight * formReps)
+                    });
+                  }
+                }
+              })
+            }
         }
 
         return (<>
