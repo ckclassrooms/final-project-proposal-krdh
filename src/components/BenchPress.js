@@ -1,46 +1,66 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React from "react"
 import "firebase/database"
 import { Button } from "react-bootstrap"
 import { useState } from "react";
 import { db } from "../firebase";
-import { collection, getDocs, addDoc, doc, deleteDoc } from "firebase/firestore";
+import { collection, getDocs, doc, deleteDoc, setDoc, onSnapshot } from "firebase/firestore";
 import firebase from "firebase/compat/app";
 import { Link } from "react-router-dom"
+import "react-router-dom"
 
 function BenchPress({benchPressQueue, setBenchPressQueue}) {
-
+  
   const [newWeight, setNewWeight] = useState(0);
-  const [newID, setNewID] = useState(0);
+  const [curEmail, setCurEmail] = useState("-");
+
   const benchPressQueueCollectionRef = collection(db, "benchPressQueue"); 
+  const benchPressChatRoomRef = collection(db, "benchPressChatRoom"); 
 
   const addUserToQueue = async () => {
     firebase.auth().onAuthStateChanged(async function(user) {
       // - If user is authenticated
-      console.log("ADDED")
-      console.trace();
       if (user) {
         // - Get current user email
         var email = user.email;
+        setCurEmail(email);
         const data = await getDocs(benchPressQueueCollectionRef)
         // - Get all users in the bench press queue
         const users = data.docs.map((doc) => ({...doc.data(), id: doc.id}))
+        // - Make list of emails
         const emails = []
         for (var i=0; i < users.length; i++) {
           emails.push(users[i].email)
         }
+        // - Check if there are any users in the queue with the same weight class
+        // - If so redirect users to the chat room
+        for (var k=0; k < users.length; k++) {
+          var weightClass = users[k].weightClass
+          if (Math.abs(newWeight - weightClass) <= 20){
+            await setDoc(doc(db, "benchPressChatRoom", users[k].email), {
+              email: users[k].email,
+            });
+            await setDoc(doc(db, "benchPressChatRoom", email), {
+              email: email,
+            });
+          }
+        }
+
         // - If current user in queue, don't let them join
         if (emails.includes(email) === true) {
           // TO DO - ERROR HANDLE with POPUP 
           console.log("Already in queue")
+          return
         } else if ( newWeight <= 0) {
           // TO DO - ERROR HANDLE with POPUP 
           console.log("Weight class must be higher than 0")
+          return
         } else {
           // - If user not in queue and they enter a valid weight class, put them in the queue
-          await addDoc(benchPressQueueCollectionRef, {email: email, weightClass: Number(newWeight) })
-          .then(docRef => {
-            // - Save current ID of user spot in queue
-            setNewID(docRef.id)
+          await setDoc(doc(db, "benchPressQueue", email), {
+            email: email,
+            weightClass: newWeight,
+            matched: false
           });
           const data = await getDocs(benchPressQueueCollectionRef)
           setBenchPressQueue(data.docs.map((doc) => ({...doc.data(), id: doc.id})))
@@ -49,12 +69,29 @@ function BenchPress({benchPressQueue, setBenchPressQueue}) {
     });
   };
 
+  const unsub = onSnapshot(doc(db, "benchPressQueue", "-"), async (doc) => {
+    console.log("HELLO")
+    const data = await getDocs(benchPressChatRoomRef)
+    // - Get all users in the bench press queue
+    const users = data.docs.map((doc) => ({...doc.data(), id: doc.id}))
+    var emails = []
+    for (var i=0; i < users.length; i++) {
+      emails.push(users[i].email)
+    }
+    console.log(emails)
+    if (emails.includes(curEmail)) {
+      removeUserFromQueue()
+      window.location.replace("http://localhost:3000/chat-room");
+      unsub()
+    }
+});
+
   const removeUserFromQueue = async () => {
     firebase.auth().onAuthStateChanged(async function(user) {
       // - If user is authenticated
       if (user) {
         // - Remove user from queue
-        await deleteDoc(doc(db, "benchPressQueue", `${newID}`));
+        await deleteDoc(doc(db, "benchPressQueue", curEmail));
         const data = await getDocs(benchPressQueueCollectionRef)
         setBenchPressQueue(data.docs.map((doc) => ({...doc.data(), id: doc.id})))
       }

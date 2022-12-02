@@ -12,6 +12,7 @@ import { useCollectionData } from 'react-firebase-hooks/firestore';
 
 const auth = firebase.auth();
 const firestore = firebase.firestore();
+var messagesSent = 0;
 
 function BenchPressChatRoom() {
 
@@ -27,10 +28,24 @@ function BenchPressChatRoom() {
         const [formWeight, setFormWeight] = useState('');
         const [formReps, setFormReps] = useState('');
 
+        var email = ""
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) { // - User is signed in
+              email = user.email
+            } else {
+              // User is signed out
+            }
+          });
+
         const sendMessage = async (e) => {
             e.preventDefault();
             const { uid } = auth.currentUser;
 
+            await messagesRef.add({
+                text: email + " logged set #" + (messagesSent + 1),
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                uid
+            })
             await messagesRef.add({
                 text: formWeight + " lbs",
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -44,22 +59,23 @@ function BenchPressChatRoom() {
             setFormWeight('');
             setFormReps('');
             dummy.current.scrollIntoView({ behavior: 'smooth' });
+            messagesSent += 1;
         }
 
         return (<>
+            <div>
+            <center>
+                <h5>Log your reps and weight. Who ever can push the most volume over 4 sets wins!</h5>
+            </center>
+            </div>
             <div>
                 {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} />)}
                 <div ref={dummy}></div>
             </div>
 
-            <div>-</div>
-            <div>-</div>
-            <div>-</div>
-            <div>-</div>
-
             <form id="benchForm" onSubmit={sendMessage}>
-                <input value={formWeight} onChange={(e) => setFormWeight(e.target.value)} placeholder="Enter Weight:" />
-                <input value={formReps} onChange={(e) => setFormReps(e.target.value)} placeholder="Enter Reps:" />
+                <input id="benchField" value={formWeight} onChange={(e) => setFormWeight(e.target.value)} placeholder="Enter Weight:" />
+                <input id="benchField" value={formReps} onChange={(e) => setFormReps(e.target.value)} placeholder="Enter Reps:" />
                 <button type="submit">Send</button>
             </form>
 

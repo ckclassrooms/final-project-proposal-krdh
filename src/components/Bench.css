@@ -64,6 +64,11 @@ body {
     display: flex;
     font-size: 1.5rem;
   }
+
+  h5 {
+    padding-bottom: 75px; 
+    color: black
+  }
   
   form button {
     width: 20%;
@@ -71,8 +76,8 @@ body {
   }
   
   
-  input {
-    line-height: 1.5;
+  #benchField {
+    line-height: 1;
     width: 100%;
     font-size: 1.5rem;
     background: rgb(58, 58, 58);
@@ -106,9 +111,6 @@ body {
     max-width: 400px;
     margin: 0 auto;
   }
-  
-  
-  
   
   ul, li {
     text-align: left;

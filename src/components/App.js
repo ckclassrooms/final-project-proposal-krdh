@@ -41,7 +41,6 @@ function App() {
       querySnapshot.forEach((doc) => {
         users.push(doc.data().email);
       });
-      console.log(users.join(", "));
       // - Load in new snapshot
       const getBenchPressQueue = async () => {
         const data = await getDocs(benchPressQueueCollectionRef)
