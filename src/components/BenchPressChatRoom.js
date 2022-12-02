@@ -1,7 +1,8 @@
 import React from 'react'
 import './Bench.css';
-
+import { collection, doc, deleteDoc } from "firebase/firestore";
 import {useState, useRef} from 'react';
+import { db } from "../firebase";
 
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
@@ -12,9 +13,22 @@ import { useCollectionData } from 'react-firebase-hooks/firestore';
 
 const auth = firebase.auth();
 const firestore = firebase.firestore();
-var messagesSent = 0;
 
 function BenchPressChatRoom() {
+
+    const [totalWeightPushed, setTotalWeightPushed] = useState(0);
+    const [oppWeightPushed, setOppTotalWeightPushed] = useState(0);
+
+    const benchPressChatRoomRef = collection(db, "benchPressChatRoom"); 
+
+    const removeUserFromQueue = async () => {
+      firebase.auth().onAuthStateChanged(async function(user) {
+        // - If user is authenticated
+        if (user) {
+          // - Remove user from queue
+          await deleteDoc(doc(db, "benchPressChatRoom", user.email));
+        }
+    })};
 
     function ChatRoom() {
 
@@ -41,25 +55,27 @@ function BenchPressChatRoom() {
             e.preventDefault();
             const { uid } = auth.currentUser;
 
-            await messagesRef.add({
-                text: email + " logged set #" + (messagesSent + 1),
+            if ((!isNaN(formWeight) && !isNaN(formWeight) && formWeight.length !== 0 && formReps.length !== 0)) {
+              // weight and reps are numbers
+              await messagesRef.add({
+                text: email + " logged:",
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 uid
-            })
-            await messagesRef.add({
+              })
+              await messagesRef.add({
                 text: formWeight + " lbs",
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 uid
-            })
-            await messagesRef.add({
-                text: formReps + " reps",
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                uid
-            })
-            setFormWeight('');
-            setFormReps('');
-            dummy.current.scrollIntoView({ behavior: 'smooth' });
-            messagesSent += 1;
+              })
+              await messagesRef.add({
+                  text: formReps + " reps",
+                  createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                  uid
+              })
+              setFormWeight('');
+              setFormReps('');
+              dummy.current.scrollIntoView({ behavior: 'smooth' });
+              }
         }
 
         return (<>
@@ -100,9 +116,6 @@ function BenchPressChatRoom() {
         </div>
       )
 
-
 }
 
-
 export default BenchPressChatRoom
-

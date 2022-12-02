@@ -104,7 +104,7 @@ function BenchPress({benchPressQueue, setBenchPressQueue}) {
   };
 
   window.onbeforeunload = function(event) {
-    // -  When user clicks backspace
+    // -  When user reloads
     removeUserFromQueue();
     event.preventDefault();
   };
