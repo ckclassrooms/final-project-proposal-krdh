@@ -9,6 +9,8 @@ import firebase from "firebase/compat/app";
 import { Link } from "react-router-dom"
 import "react-router-dom"
 
+const auth = firebase.auth();
+
 function BenchPress({benchPressQueue, setBenchPressQueue}) {
   
   const [newWeight, setNewWeight] = useState(0);
@@ -39,9 +41,15 @@ function BenchPress({benchPressQueue, setBenchPressQueue}) {
           if (Math.abs(newWeight - weightClass) <= 20){
             await setDoc(doc(db, "benchPressChatRoom", users[k].email), {
               email: users[k].email,
+              score: 0,
+              messagesSent: 0,
+              won: false
             });
             await setDoc(doc(db, "benchPressChatRoom", email), {
               email: email,
+              score: 0,
+              messagesSent: 0,
+              won: false
             });
           }
         }
@@ -70,7 +78,6 @@ function BenchPress({benchPressQueue, setBenchPressQueue}) {
   };
 
   const unsub = onSnapshot(doc(db, "benchPressQueue", "-"), async (doc) => {
-    console.log("HELLO")
     const data = await getDocs(benchPressChatRoomRef)
     // - Get all users in the bench press queue
     const users = data.docs.map((doc) => ({...doc.data(), id: doc.id}))

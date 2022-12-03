@@ -1,6 +1,6 @@
 import React from 'react'
 import './Bench.css';
-import { collection, doc, deleteDoc, updateDoc, increment, getDocs, setDoc } from "firebase/firestore";
+import { collection, doc, deleteDoc, updateDoc, increment, getDocs, setDoc, onSnapshot } from "firebase/firestore";
 import {useState, useRef} from 'react';
 import { db } from "../firebase";
 
@@ -14,13 +14,11 @@ import { useCollectionData } from 'react-firebase-hooks/firestore';
 const auth = firebase.auth();
 const firestore = firebase.firestore();
 
+
 function BenchPressChatRoom() {
 
-    const [totalWeightPushed, setTotalWeightPushed] = useState(0);
-    const [oppWeightPushed, setOppTotalWeightPushed] = useState(0);
-
     const benchPressChatRoomRef = collection(db, "benchPressChatRoom"); 
-    const benchPressMessagesRef = collection(db, "benchPressMessages"); 
+    // const benchPressMessagesRef = collection(db, "benchPressMessages"); 
 
     const removeUserFromQueue = async () => {
       firebase.auth().onAuthStateChanged(async function(user) {
@@ -37,20 +35,12 @@ function BenchPressChatRoom() {
 
         const messagesRef = firestore.collection('benchPressMessages');
         const query = messagesRef.orderBy('createdAt').limit(25);
-
         const [messages] = useCollectionData(query, { idField: 'id' });
 
         const [formWeight, setFormWeight] = useState('');
         const [formReps, setFormReps] = useState('');
 
-        var email = ""
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) { // - User is signed in
-              email = user.email
-            } else {
-              // User is signed out
-            }
-          });
+        const [buttonDisabled, setButtonDisabled] = useState(false);
 
         const sendMessage = async (e) => {
             e.preventDefault();
@@ -59,45 +49,60 @@ function BenchPressChatRoom() {
             if ((!isNaN(formWeight) && !isNaN(formWeight) && formWeight.length !== 0 && formReps.length !== 0)) {
               // weight and reps are numbers
               await messagesRef.add({
-                text: email + " logged:",
+                text: formWeight + " lbs" + " X " + formReps + " reps",
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 uid
-              })
-              await messagesRef.add({
-                text: formWeight + " lbs",
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                uid
-              })
-              await messagesRef.add({
-                  text: formReps + " reps",
-                  createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                  uid
               })
           
               setFormWeight('');
               setFormReps('');
               dummy.current.scrollIntoView({ behavior: 'smooth' });
 
-              firebase.auth().onAuthStateChanged(async function(user) {
-                // - If user is authenticated
-                if (user) {
-                  const data = await getDocs(benchPressMessagesRef)
-                  // - Get all users in the bench press queue
-                  const messages = data.docs.map((doc) => ({...doc.data(), id: doc.id}))
-                  if (messages.length === 3) {
-                      await setDoc(doc(db, "benchPressMessages",  user.email), {
-                        score: formWeight * formReps,
-                      });
-                  } else {
-                    const userRef = doc(db, "benchPressMessages", user.email);
-                      await updateDoc(userRef, {
-                      score: increment(formWeight * formReps)
-                    });
-                  }
+              // - Update score
+              const userRef = doc(db, "benchPressChatRoom", auth.currentUser.email);
+              await updateDoc(userRef, {
+                score: increment(formWeight * formReps),
+                messagesSent: increment(1)
+              });
+              const data = await getDocs(benchPressChatRoomRef)
+              // - Get all users in the bench press queue
+              const users = data.docs.map((doc) => ({...doc.data(), id: doc.id}))
+              // - Increment messages sent counter 
+              if (users[0].email === auth.currentUser.email) {
+                if (users[0].messagesSent === 4) {
+                  setButtonDisabled(true)
                 }
-              })
+              } else {
+                if (users[1].messagesSent === 4) {
+                  setButtonDisabled(true)
+                }
+              }
+
+              // - If both users are done
+              if (users[0].messagesSent === 4 && users[1].messagesSent === 4) {
+                if (users[0].score > users[1].score) {
+                  const ref = doc(db, 'benchPressChatRoom', users[0].email);
+                  setDoc(ref, { won: true }, { merge: true });
+                } else {
+                  const ref = doc(db, 'benchPressChatRoom', users[1].email);
+                  setDoc(ref, { won: true }, { merge: true });
+                }
+                const ref1 = doc(db, 'benchPressChatRoom', users[0].email);
+                setDoc(ref1, { score: -1 }, { merge: true });
+                const ref2 = doc(db, 'benchPressChatRoom', users[1].email);
+                setDoc(ref2, { score: -1 }, { merge: true });
+              }
             }
         }
+
+        const unsub = onSnapshot(doc(db, "benchPressChatRoom", "-"), async (doc) => {
+          const data = await getDocs(benchPressChatRoomRef)
+          const users = data.docs.map((doc) => ({...doc.data(), id: doc.id}))
+          if (users[0].score === -1 && users[1].score === -1) {
+            window.location.replace("http://localhost:3000/");
+          }
+          unsub()
+      });
 
         return (<>
             <div>
@@ -113,7 +118,7 @@ function BenchPressChatRoom() {
             <form id="benchForm" onSubmit={sendMessage}>
                 <input id="benchField" value={formWeight} onChange={(e) => setFormWeight(e.target.value)} placeholder="Enter Weight:" />
                 <input id="benchField" value={formReps} onChange={(e) => setFormReps(e.target.value)} placeholder="Enter Reps:" />
-                <button type="submit">Send</button>
+                <button disabled={buttonDisabled} type="submit">Send</button>
             </form>
 
           </>)
